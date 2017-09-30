@@ -63,19 +63,25 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     vgg_layer7_out = tf.Print(vgg_layer7_out, [tf.shape(
         vgg_layer7_out)], message="vgg_layer7_out shape:", summarize=10, first_n=1)
 
-    conv_1_1_layer_7 = tf.layers.conv2d(
-        vgg_layer7_out, 1, 1, padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    extra_conv_params = {
+        'padding': 'same',
+        'kernel_regularizer': tf.contrib.layers.l2_regularizer(1e-3)
+    }
 
-    output = tf.layers.conv2d_transpose(conv_1_1_layer_7, num_classes, 4, 2,
-                                        padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    layer7_c_1_1 = tf.layers.conv2d(vgg_layer7_out, 1, 1, **extra_conv_params)
+    layer4_c_1_1 = tf.layers.conv2d(vgg_layer4_out, 1, 1, **extra_conv_params)
+    layer3_c_1_1 = tf.layers.conv2d(vgg_layer4_out, 1, 1, **extra_conv_params)
 
     output = tf.layers.conv2d_transpose(
-        output, num_classes, 4, 2, padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
-    output = tf.layers.conv2d_transpose(
-        output, num_classes, 16, 8, padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+        layer7_c_1_1, num_classes, 4, 2, **extra_conv_params)
+    output = tf.add(output, layer4_c_1_1)
 
-    output = tf.Print(output, [tf.shape(output)],
-                      message="Shape of output:", summarize=10, first_n=1)
+    output = tf.layers.conv2d_transpose(
+        output, num_classes, 4, 2, **extra_conv_params)
+    output = tf.add(output, layer3_c_1_1)
+
+    output = tf.layers.conv2d_transpose(
+        output, num_classes, 16, 8, **extra_conv_params)
 
     return output
 
