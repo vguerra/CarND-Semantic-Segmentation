@@ -60,6 +60,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :param num_classes: Number of classes to classify
     :return: The Tensor for the last layer of output
     """
+
     vgg_layer7_out = tf.Print(vgg_layer7_out, [tf.shape(
         vgg_layer7_out)], message="vgg_layer7_out shape:", summarize=10, first_n=1)
 
@@ -70,7 +71,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 
     layer7_c_1_1 = tf.layers.conv2d(vgg_layer7_out, 1, 1, **extra_conv_params)
     layer4_c_1_1 = tf.layers.conv2d(vgg_layer4_out, 1, 1, **extra_conv_params)
-    layer3_c_1_1 = tf.layers.conv2d(vgg_layer4_out, 1, 1, **extra_conv_params)
+    layer3_c_1_1 = tf.layers.conv2d(vgg_layer3_out, 1, 1, **extra_conv_params)
 
     output = tf.layers.conv2d_transpose(
         layer7_c_1_1, num_classes, 4, 2, **extra_conv_params)
