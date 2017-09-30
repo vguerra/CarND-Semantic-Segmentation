@@ -64,25 +64,23 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     vgg_layer7_out = tf.Print(vgg_layer7_out, [tf.shape(
         vgg_layer7_out)], message="vgg_layer7_out shape:", summarize=10, first_n=1)
 
-    extra_conv_params = {
-        'padding': 'same',
-        'kernel_regularizer': tf.contrib.layers.l2_regularizer(1e-3)
-    }
-
-    layer7_c_1_1 = tf.layers.conv2d(vgg_layer7_out, 1, 1, **extra_conv_params)
-    layer4_c_1_1 = tf.layers.conv2d(vgg_layer4_out, 1, 1, **extra_conv_params)
-    layer3_c_1_1 = tf.layers.conv2d(vgg_layer3_out, 1, 1, **extra_conv_params)
+    layer7_c_1_1 = tf.layers.conv2d(
+        vgg_layer7_out, 1, 1, padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    layer4_c_1_1 = tf.layers.conv2d(
+        vgg_layer4_out, 1, 1, padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    layer3_c_1_1 = tf.layers.conv2d(
+        vgg_layer3_out, 1, 1, padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     output = tf.layers.conv2d_transpose(
-        layer7_c_1_1, num_classes, 4, 2, **extra_conv_params)
+        layer7_c_1_1, num_classes, 4, 2, padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     output = tf.add(output, layer4_c_1_1)
 
     output = tf.layers.conv2d_transpose(
-        output, num_classes, 4, 2, **extra_conv_params)
+        output, num_classes, 4, 2, padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     output = tf.add(output, layer3_c_1_1)
 
     output = tf.layers.conv2d_transpose(
-        output, num_classes, 16, 8, **extra_conv_params)
+        output, num_classes, 16, 8, padding='same', kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     return output
 
@@ -199,7 +197,8 @@ def run():
                  keep_prob, learning_rate)
 
         # TODO: Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, image_input)
+        helper.save_inference_samples(
+            runs_dir, data_dir, sess, image_shape, logits, keep_prob, image_input)
 
         # OPTIONAL: Apply the trained model to a video
 
